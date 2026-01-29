@@ -1,0 +1,28 @@
+name: Deploy Base
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment (dev/staging/prod)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deployment placeholder
+        run: |
+          echo "Deploying to ${{ inputs.environment }}"
