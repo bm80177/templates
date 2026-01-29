@@ -1,0 +1,26 @@
+name: Security Notifications
+
+on:
+  workflow_call:
+    inputs:
+      message:
+        description: "Notification message"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK != ''
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"${{ inputs.message }}\"}" \
+          $SLACK_WEBHOOK
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
