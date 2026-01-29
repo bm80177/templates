@@ -1,0 +1,26 @@
+name: Security Audit Evidence
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Collect metadata
+        run: |
+          echo "Repo: $GITHUB_REPOSITORY" > audit.txt
+          echo "Commit: $GITHUB_SHA" >> audit.txt
+          echo "Actor: $GITHUB_ACTOR" >> audit.txt
+          echo "Workflow: $GITHUB_WORKFLOW" >> audit.txt
+          echo "Run ID: $GITHUB_RUN_ID" >> audit.txt
+
+      - name: Upload audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit
+          path: audit.txt
