@@ -1,0 +1,48 @@
+name: CI / CD
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  # --------------------
+  # CI
+  # --------------------
+  ci:
+    uses: org/templates/.github/workflows/ci-base.yml@v1
+    with:
+      language: node
+
+  sast:
+    uses: org/templates/.github/workflows/security-sast.yml@v1
+    with:
+      languages: javascript
+
+  secrets:
+    uses: org/templates/.github/workflows/security-secrets.yml@v1
+
+  # --------------------
+  # Container
+  # --------------------
+  container-build:
+    needs: ci
+    uses: org/templates/.github/workflows/container-build.yml@v1
+    with:
+      image-name: my-org/my-app
+
+  container-scan:
+    needs: container-build
+    uses: org/templates/.github/workflows/container-scan.yml@v1
+    with:
+      image-name: my-org/my-app:ci
+
+  # --------------------
+  # Deploy
+  # --------------------
+  deploy-dev:
+    if: github.ref == 'refs/heads/main'
+    needs: container-scan
+    uses: org/templates/.github/workflows/deploy-base.yml@v1
+    with:
+      environment: dev
