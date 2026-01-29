@@ -1,0 +1,70 @@
+name: CI Base
+
+on:
+  workflow_call:
+    inputs:
+      language:
+        description: "Project language"
+        required: true
+        type: string
+      node-version:
+        description: "Node version (if language=node)"
+        required: false
+        default: "20"
+        type: string
+      python-version:
+        description: "Python version (if language=python)"
+        required: false
+        default: "3.11"
+        type: string
+
+permissions:
+  contents: read
+  id-token: write   # for future OIDC usage
+  actions: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --------------------
+      # Node.js setup
+      # --------------------
+      - name: Setup Node
+        if: inputs.language == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Install Node dependencies
+        if: inputs.language == 'node'
+        run: npm ci
+
+      - name: Run Node tests
+        if: inputs.language == 'node'
+        run: npm test --if-present
+
+      # --------------------
+      # Python setup
+      # --------------------
+      - name: Setup Python
+        if: inputs.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+
+      - name: Install Python dependencies
+        if: inputs.language == 'python'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Python tests
+        if: inputs.language == 'python'
+        run: pytest
