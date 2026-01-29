@@ -9,14 +9,14 @@ on:
 
 jobs:
   ci:
-    uses: org/templates/.github/workflows/ci/ci-base.yml@v1
+    uses: org/templates/.github/workflows/ci-base.yml@v1
     with:
       language: ${{ inputs.language }}
 
   sast:
-    uses: org/templates/.github/workflows/security/security-sast.yml@v1
+    uses: org/templates/.github/workflows/security-sast.yml@v1
     with:
       languages: ${{ inputs.language }}
 
   secrets:
-    uses: org/templates/.github/workflows/security/security-secrets.yml@v1
+    uses: org/templates/.github/workflows/security-secrets.yml@v1
