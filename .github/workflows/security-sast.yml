@@ -1,0 +1,39 @@
+name: SAST (CodeQL)
+
+on:
+  workflow_call:
+    inputs:
+      languages:
+        description: "Comma-separated languages (e.g. javascript,python)"
+        required: true
+        type: string
+      fail-on-critical:
+        description: "Fail build on critical findings"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.languages }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          fail-on: ${{ inputs.fail-on-critical && 'error' || 'none' }}
