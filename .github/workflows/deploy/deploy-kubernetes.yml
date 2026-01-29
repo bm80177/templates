@@ -1,0 +1,47 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: string
+      manifests-path:
+        description: "Path to k8s manifests"
+        required: false
+        default: k8s/
+        type: string
+      namespace:
+        description: "Kubernetes namespace"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Example: Azure AKS / AWS EKS / GKE auth goes here
+      # via OIDC federation
+
+      - name: Validate manifests
+        run: |
+          kubectl apply \
+            --dry-run=client \
+            -f ${{ inputs.manifests-path }}
+
+      - name: Deploy
+        run: |
+          kubectl apply \
+            -n ${{ inputs.namespace }} \
+            -f ${{ inputs.manifests-path }}
