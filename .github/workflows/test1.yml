@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  ci:
+    uses: org/templates/.github/workflows/ci-base.yml@v1
+    with:
+      language: node
+
+  pr-checks:
+    if: github.event_name == 'pull_request'
+    uses: org/templates/.github/workflows/ci-pr-checks.yml@v1
+
+  sast:
+    uses: org/templates/.github/workflows/security-sast.yml@v1
+    with:
+      languages: javascript
+      fail-on-critical: false
+
+  secrets:
+    uses: org/templates/.github/workflows/security-secrets.yml@v1
